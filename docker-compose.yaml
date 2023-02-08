@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  webapp:
+    build: 
+      context: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./src:/src
+    ports:
+      - "8006:8000"
+      - "6380:6380"
+    environment:
+      - DJANGO_REDIS_HOST=redis
+      - DJANGO_REDIS_PORT=6380
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+    networks:
+      - core-network
+      - frosthaven
+
+  redis:
+    image: redis
+    networks:
+      - frosthaven
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    networks:
+      - frosthaven
+
+volumes:
+  postgres_data:
+
+networks:
+  frosthaven:
+    external: false
+  core-network: 
+    external: true

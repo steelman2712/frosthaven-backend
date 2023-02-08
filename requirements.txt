@@ -1,0 +1,7 @@
+django
+channels
+channels_redis
+django-bootstrap-v5
+django_cryptography
+django-cors-headers
+psycopg2
