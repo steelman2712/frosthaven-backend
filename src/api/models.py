@@ -101,7 +101,7 @@ class CharacterCard(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
     ability_card = models.ForeignKey(AbilityCard, on_delete=models.CASCADE)
     equipped = models.BooleanField()
-
+    
     def __str__(self):
         return f"{self.character} : {self.ability_card}"
 
