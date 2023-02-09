@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 NGINX_DOMAIN = os.environ.get("NGINX_DOMAIN")
@@ -39,8 +39,7 @@ FORCE_SCRIPT_NAME = f"/{NGINX_SUBDOMAIN}"
 STATIC_URL = f"/{NGINX_SUBDOMAIN}/static/"
 MEDIA_URL = f"/{NGINX_SUBDOMAIN}/media/"
 
-LOGIN_URL = 'login'
-LOGOUT_URL = 'logout'
+
 
 # Application definition
 
@@ -52,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "corsheaders",
+    'rest_framework',
     'api.apps.ApiConfig',
 ]
 
@@ -98,6 +98,12 @@ WSGI_APPLICATION = 'frosthaven.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 # django_project/settings.py
 DATABASES = {

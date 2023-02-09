@@ -1,9 +1,8 @@
 from django.urls import path
 
-from . import views
+from .views import CharactersView, CharacterView
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('characters',views.characters, name='characters'),
-    path('character/<character_id>', views.character, name='character'),
+    path('characters',CharactersView.as_view(), name='characters'),
+    path('character/<character_id>', CharacterView.as_view(), name='character'),
 ]

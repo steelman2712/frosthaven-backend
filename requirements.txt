@@ -5,3 +5,4 @@ django-bootstrap-v5
 django_cryptography
 django-cors-headers
 psycopg2
+djangorestframework-simplejwt
