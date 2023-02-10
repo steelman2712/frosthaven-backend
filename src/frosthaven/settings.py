@@ -27,18 +27,18 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = True
 
 
-NGINX_DOMAIN = os.environ.get("NGINX_DOMAIN")
-NGINX_SUBDOMAIN = os.environ.get("NGINX_SUBDOMAIN")
-print("NGINX_SUBDOMAIN", NGINX_SUBDOMAIN)
+DOMAIN = os.environ.get("DOMAIN")
+SUBDIRECTORY = os.environ.get("SUBDIRECTORY")
+print("SUBDIRECTORY", SUBDIRECTORY)
 
-ALLOWED_HOSTS = [NGINX_DOMAIN, "localhost"]
-CSRF_TRUSTED_ORIGINS = [f"https://{NGINX_DOMAIN}"]
+ALLOWED_HOSTS = [DOMAIN, "localhost"]
+CSRF_TRUSTED_ORIGINS = [f"https://{DOMAIN}"]
 
 USE_X_FORWARDED_HOST = True
-FORCE_SCRIPT_NAME = f"/{NGINX_SUBDOMAIN}"
-STATIC_URL = f"/{NGINX_SUBDOMAIN}/static/"
-MEDIA_URL = f"/{NGINX_SUBDOMAIN}/media/"
-
+FORCE_SCRIPT_NAME = f"/{SUBDIRECTORY}"
+STATIC_URL = f"/{SUBDIRECTORY}/static/"
+MEDIA_URL = f"/{SUBDIRECTORY}/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR ,"media")
 
 
 # Application definition
@@ -68,7 +68,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-#CORS_ALLOWED_ORIGINS = [f"https://{NGINX_DOMAIN}","https://92.40.169.98"]
+#CORS_ALLOWED_ORIGINS = [f"https://{DOMAIN}","https://92.40.169.98"]
 CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'frosthaven.urls'
 
@@ -161,18 +161,18 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Security
 
 SECURE_HSTS_SECONDS = 2,592,000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_INCLUDE_SUBDIRECTORYS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-CSP_DEFAULT_SRC = ["'none'"]
+CSP_DEFAULT_SRC = ["default-src 'self';"]
 CSP_UPGRADE_INSECURE_REQUESTS = True
 CSP_REPORT_PERCENTAGE = 0.6
 

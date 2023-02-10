@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from .constants import get_level
 
+import os
+
 # Create your models here.
 class CharacterClass(models.Model):
     name = models.CharField(max_length=200)
@@ -18,6 +20,7 @@ class AbilityCard(models.Model):
     installation_charges = models.IntegerField()
     burn_after_install = models.BooleanField()
     level = models.IntegerField()
+    image = models.ImageField(upload_to='cards/', null=True)
 
     def __str__(self):
         return self.name
@@ -29,7 +32,8 @@ class AbilityCard(models.Model):
             "can_install":self.can_install,
             "installation_charges":self.installation_charges,
             "burn_after_install":self.burn_after_install,
-            "level":self.level
+            "level":self.level,
+            "file":f"{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}"
         }
 
 class Item(models.Model):

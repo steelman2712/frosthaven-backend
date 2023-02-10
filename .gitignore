@@ -1,5 +1,6 @@
 # Django generated static files
-src/static/admin
+src/static/
+src/media 
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
