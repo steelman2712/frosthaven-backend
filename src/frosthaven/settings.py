@@ -31,7 +31,7 @@ NGINX_DOMAIN = os.environ.get("NGINX_DOMAIN")
 NGINX_SUBDOMAIN = os.environ.get("NGINX_SUBDOMAIN")
 print("NGINX_SUBDOMAIN", NGINX_SUBDOMAIN)
 
-ALLOWED_HOSTS = [NGINX_DOMAIN]
+ALLOWED_HOSTS = [NGINX_DOMAIN, "localhost"]
 CSRF_TRUSTED_ORIGINS = [f"https://{NGINX_DOMAIN}"]
 
 USE_X_FORWARDED_HOST = True
@@ -58,6 +58,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "django_permissions_policy.PermissionsPolicyMiddleware",
+    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -166,3 +168,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECURE_HSTS_SECONDS = 2,592,000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+CSP_DEFAULT_SRC = ["'none'"]
+CSP_UPGRADE_INSECURE_REQUESTS = True
+CSP_REPORT_PERCENTAGE = 0.6
+
+PERMISSIONS_POLICY = {
+    "accelerometer": [],
+    "ambient-light-sensor": [],
+    "autoplay": [],
+    "camera": [],
+    "display-capture": [],
+    "document-domain": [],
+    "encrypted-media": [],
+    "fullscreen": [],
+    "geolocation": [],
+    "gyroscope": [],
+    "interest-cohort": [],
+    "magnetometer": [],
+    "microphone": [],
+    "midi": [],
+    "payment": [],
+    "usb": [],
+}

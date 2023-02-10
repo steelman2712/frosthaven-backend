@@ -6,3 +6,5 @@ django_cryptography
 django-cors-headers
 psycopg2
 djangorestframework-simplejwt
+django-csp
+django-permissions-policy
