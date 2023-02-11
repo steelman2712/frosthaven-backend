@@ -29,9 +29,9 @@ class AbilityCard(models.Model):
         return {
             "name":self.name,
             "initiative":self.initiative,
-            "can_install":self.can_install,
-            "installation_charges":self.installation_charges,
-            "burn_after_install":self.burn_after_install,
+            "canInstall":self.can_install,
+            "installationCharges":self.installation_charges,
+            "burnAfterInstall":self.burn_after_install,
             "level":self.level,
             "file":f"https://{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}"
         }
@@ -51,9 +51,9 @@ class Item(models.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "flip_name": self.flip_name,
+            "flipName": self.flip_name,
             "description": self.description,
-            "flip_description": self.flip_description,
+            "flipDescription": self.flip_description,
             "slot": self.slot
         }
 
@@ -72,7 +72,7 @@ class Perk(models.Model):
             "name" : self.name,
             "file": f"https://{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}",
             "active":self.active,
-            "max_uses":self.max_uses
+            "maxUses":self.max_uses
         }
 
 class Character(models.Model):
@@ -102,7 +102,7 @@ class Character(models.Model):
     def basic_info(self):
         return {
             "id":self.id,
-            "character_class":self.character_class.name,
+            "characterClass":self.character_class.name,
             "name": self.name,
             "retired": self.retired
         }
@@ -137,7 +137,7 @@ class Character(models.Model):
             "snowthistle": self.snowthistle,
             
             "items":[item.payload() for item in items],
-            "ability_cards":[ability_card.payload() for ability_card in ability_cards],
+            "abilityCards":[ability_card.payload() for ability_card in ability_cards],
             "perks":[perk.payload() for perk in perks],
         }
 

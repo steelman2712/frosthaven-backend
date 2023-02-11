@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Character, AbilityCard, Perk
+from .models import Character, AbilityCard, Perk, CharacterClass
 
 import json
 
@@ -16,7 +16,6 @@ import json
 class CharactersView(APIView):
     permission_classes=[IsAuthenticated] 
     def get(self, request):
-        print("Hello")
         characters = request.user.character_set.all()
         payload = {"characters" : [character.basic_info() for character in characters]}
         return JsonResponse(payload)
@@ -45,11 +44,15 @@ class CharacterView(APIView):
 
 
     def post(self,request):
+            player = request.user
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
-            content = body['content']
-            character_class = content["character_class"]
-            print(character_class)
+            character_class_name = body["characterClass"]
+            name = body["name"]
+            character_class = CharacterClass.objects.filter(name=character_class_name).all()[0]
+            character = Character(player=player, name=name, character_class=character_class)
+            character.save()
+            return JsonResponse(character.payload())
 
 class CardsView(APIView):
     permission_classes=[IsAuthenticated] 

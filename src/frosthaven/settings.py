@@ -29,7 +29,6 @@ DEBUG = True
 
 DOMAIN = os.environ.get("DOMAIN")
 SUBDIRECTORY = os.environ.get("SUBDIRECTORY")
-print("SUBDIRECTORY", SUBDIRECTORY)
 
 ALLOWED_HOSTS = [DOMAIN, "localhost"]
 CSRF_TRUSTED_ORIGINS = [f"https://{DOMAIN}"]
