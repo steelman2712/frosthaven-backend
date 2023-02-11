@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Character
+from .models import Character, AbilityCard, Perk
 
 import json
 
@@ -50,3 +50,19 @@ class CharacterView(APIView):
             content = body['content']
             character_class = content["character_class"]
             print(character_class)
+
+class CardsView(APIView):
+    permission_classes=[IsAuthenticated] 
+    def get(self, request):
+        character_class_id = request.GET.get("characterClass")
+        cards = AbilityCard.objects.filter(character_class=character_class_id)
+        payload = {"cards" : [card.payload() for card in cards]}
+        return JsonResponse(payload)
+
+class PerksView(APIView):
+    permission_classes=[IsAuthenticated] 
+    def get(self, request):
+        character_class_id = request.GET.get("characterClass")
+        perks = Perk.objects.filter(character_class=character_class_id)
+        payload = {"perks" : [perk.payload() for perk in perks]}
+        return JsonResponse(payload)

@@ -16,14 +16,14 @@ class AbilityCard(models.Model):
     name = models.CharField(max_length=200)
     character_class = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
     initiative = models.IntegerField()
-    can_install = models.BooleanField()
-    installation_charges = models.IntegerField()
-    burn_after_install = models.BooleanField()
+    can_install = models.BooleanField(default=False)
+    installation_charges = models.IntegerField(default=1)
+    burn_after_install = models.BooleanField(default=False)
     level = models.IntegerField()
     image = models.ImageField(upload_to='cards/', null=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.character_class}:{self.name}"
 
     def payload(self):
         return {
@@ -33,7 +33,7 @@ class AbilityCard(models.Model):
             "installation_charges":self.installation_charges,
             "burn_after_install":self.burn_after_install,
             "level":self.level,
-            "file":f"{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}"
+            "file":f"https://{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}"
         }
 
 class Item(models.Model):
@@ -42,6 +42,7 @@ class Item(models.Model):
     description = models.CharField(max_length=500)
     flip_description = models.CharField(max_length=500, blank=True, null=True)
     slot = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='items/', null=True)
 
     def __str__(self):
         return self.name
@@ -59,6 +60,22 @@ class Item(models.Model):
 class Perk(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
+    character_class = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='perks/', null=True)
+    active = models.BooleanField(default=False)
+    max_uses = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.character_class} : {self.name}"
+
+    def payload(self):
+        return {
+            "name" : self.name,
+            "description": self.description,
+            "file": f"https://{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}",
+            "active":self.active,
+            "max_uses":self.max_uses
+        }
 
 class Character(models.Model):
     player = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -95,8 +112,10 @@ class Character(models.Model):
     def payload(self):
         character_items = self.characteritem_set.all()
         character_cards = self.charactercard_set.all()
+        character_perks = self.characterperk_set.all()
         items = [character_item.item for character_item in character_items]
         ability_cards = [character_card.ability_card for character_card in character_cards]
+        perks = [character_perk.perk for character_perk in character_perks]
         return {
             "id":self.id,
             "character_class":self.character_class.name,
@@ -120,7 +139,8 @@ class Character(models.Model):
             "snowthistle": self.snowthistle,
             
             "items":[item.payload() for item in items],
-            "ability_cards":[ability_card.payload() for ability_card in ability_cards]
+            "ability_cards":[ability_card.payload() for ability_card in ability_cards],
+            "perks":[perk.payload() for perk in perks],
         }
 
 class CharacterCard(models.Model):
@@ -142,7 +162,8 @@ class CharacterItem(models.Model):
 class CharacterPerk(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
     perk = models.ForeignKey(Perk, on_delete=models.CASCADE)
-    active = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.character} : {self.perk}"
 
     
