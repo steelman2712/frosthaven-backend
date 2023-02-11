@@ -116,7 +116,7 @@ class Character(models.Model):
         perks = [character_perk.perk for character_perk in character_perks]
         return {
             "id":self.id,
-            "character_class":self.character_class.name,
+            "characterClass":self.character_class.name,
             "name": self.name,
             "retired": self.retired,
             "experience":self.experience,
