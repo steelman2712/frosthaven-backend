@@ -59,7 +59,6 @@ class Item(models.Model):
 
 class Perk(models.Model):
     name = models.CharField(max_length=200)
-    description = models.CharField(max_length=200)
     character_class = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='perks/', null=True)
     active = models.BooleanField(default=False)
@@ -71,7 +70,6 @@ class Perk(models.Model):
     def payload(self):
         return {
             "name" : self.name,
-            "description": self.description,
             "file": f"https://{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}",
             "active":self.active,
             "max_uses":self.max_uses
