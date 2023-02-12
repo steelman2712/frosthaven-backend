@@ -1,6 +1,6 @@
 
 def get_level(exp):
-    levels = []
+    levels = [1]
     for exp_needed in EXP_LEVEL.keys():
         if exp >= exp_needed: 
             levels.append(EXP_LEVEL[exp_needed])

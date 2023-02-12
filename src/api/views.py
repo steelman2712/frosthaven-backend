@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Character, AbilityCard, Perk, CharacterClass
+from .models import Character, AbilityCard, Perk, CharacterClass, CharacterCard
 
 import json
 
@@ -52,6 +52,18 @@ class CharacterView(APIView):
             character_class = CharacterClass.objects.filter(name=character_class_name).all()[0]
             character = Character(player=player, name=name, character_class=character_class)
             character.save()
+
+            cards = AbilityCard.objects.filter(character_class=character_class, level=1).all()
+            hand_size = character_class.hand_size
+            i = 0
+            for card in cards:
+                if i < hand_size:
+                    character_card = CharacterCard(character=character,ability_card=card,equipped=True)
+                else:
+                    character_card = CharacterCard(character=character,ability_card=card,equipped=False)
+                character_card.save()
+                i = i + 1
+
             return JsonResponse(character.payload())
 
 class CardsView(APIView):

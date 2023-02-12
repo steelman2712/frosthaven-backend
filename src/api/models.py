@@ -27,6 +27,7 @@ class AbilityCard(models.Model):
 
     def payload(self):
         return {
+            "id": self.id,
             "name":self.name,
             "initiative":self.initiative,
             "canInstall":self.can_install,
@@ -69,6 +70,7 @@ class Perk(models.Model):
 
     def payload(self):
         return {
+            "id": self.id,
             "name" : self.name,
             "file": f"https://{os.environ.get('DOMAIN')}/{os.environ.get('SUBDIRECTORY')}/media/{self.image}",
             "active":self.active,
@@ -111,8 +113,8 @@ class Character(models.Model):
         character_items = self.characteritem_set.all()
         character_cards = self.charactercard_set.all()
         character_perks = self.characterperk_set.all()
-        items = [character_item.item for character_item in character_items]
-        ability_cards = [character_card.ability_card for character_card in character_cards]
+        items = [character_item.payload() for character_item in character_items]
+        ability_cards = [character_card.payload() for character_card in character_cards]
         perks = [character_perk.perk for character_perk in character_perks]
         return {
             "id":self.id,
@@ -121,7 +123,7 @@ class Character(models.Model):
             "retired": self.retired,
             "experience":self.experience,
             "level" : get_level(self.experience),
-            "hand_size":self.character_class.hand_size,
+            "handSize":self.character_class.hand_size,
             "notes": self.notes,
 
             "gold": self.gold,
@@ -136,8 +138,8 @@ class Character(models.Model):
             "rockroot": self.rockroot,
             "snowthistle": self.snowthistle,
             
-            "items":[item.payload() for item in items],
-            "abilityCards":[ability_card.payload() for ability_card in ability_cards],
+            "items":items,
+            "abilityCards":ability_cards,
             "perks":[perk.payload() for perk in perks],
         }
 
@@ -149,6 +151,11 @@ class CharacterCard(models.Model):
     def __str__(self):
         return f"{self.character} : {self.ability_card}"
 
+    def payload(self):
+        card_info = self.ability_card.payload()
+        card_info["equipped"] = self.equipped
+        return card_info
+
 class CharacterItem(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
@@ -156,6 +163,12 @@ class CharacterItem(models.Model):
 
     def __str__(self):
         return f"{self.character} : {self.item}"
+
+    def payload(self):
+        item_info = self.item
+        item_info["equipped"] = self.equipped
+        return item_info
+
 
 class CharacterPerk(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
