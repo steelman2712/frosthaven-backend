@@ -6,7 +6,7 @@ import os
 
 # Create your models here.
 class CharacterClass(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, primary_key=True)
     hand_size = models.IntegerField()
 
     def __str__(self):
@@ -14,7 +14,7 @@ class CharacterClass(models.Model):
 
 class AbilityCard(models.Model):
     name = models.CharField(max_length=200)
-    character_class = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
+    character_class = models.ForeignKey(CharacterClass, on_delete=models.SET_NULL, null=True)
     initiative = models.IntegerField()
     can_install = models.BooleanField(default=False)
     installation_charges = models.IntegerField(default=1)
@@ -60,7 +60,7 @@ class Item(models.Model):
 
 class Perk(models.Model):
     name = models.CharField(max_length=200)
-    character_class = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
+    character_class = models.ForeignKey(CharacterClass, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to='perks/', null=True)
     active = models.BooleanField(default=False)
     max_uses = models.IntegerField(default=1)
@@ -176,5 +176,3 @@ class CharacterPerk(models.Model):
 
     def __str__(self):
         return f"{self.character} : {self.perk}"
-
-    
