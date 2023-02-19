@@ -9,3 +9,4 @@ djangorestframework-simplejwt
 django-csp
 django-permissions-policy
 pillow
+drf-spectacular

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "corsheaders",
     'rest_framework',
+    "drf_spectacular",
     'api.apps.ApiConfig',
 ]
 
@@ -107,7 +108,10 @@ WSGI_APPLICATION = 'frosthaven.wsgi.application'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # django_project/settings.py
@@ -175,7 +179,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-CSP_DEFAULT_SRC = ["default-src 'self';"]
+CSP_DEFAULT_SRC = ["default-src 'self' https://unpkg.com;"]
 CSP_UPGRADE_INSECURE_REQUESTS = True
 CSP_REPORT_PERCENTAGE = 0.6
 
@@ -196,4 +200,10 @@ PERMISSIONS_POLICY = {
     "midi": [],
     "payment": [],
     "usb": [],
+}
+
+SPECTACULAR_SETTINGS = {
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
+    'SERVERS': [{"url":f"https://{DOMAIN}/{SUBDIRECTORY}"}],
+    # OTHER SETTINGS
 }

@@ -1,29 +1,35 @@
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from rest_framework.parsers import JSONParser
+
 
 import json
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiTypes
 
-from .models import Character, AbilityCard, Perk, CharacterClass, CharacterCard
+from .models import Character, AbilityCard, Perk, CharacterClass, CharacterCard, Item, CharacterItem
+from .serialisers import CharacterSerialiser, CharacterCardSerialiser, AbilityCardSerialiser, CharacterCardUnlockSerialiser, CharacterSerialiserMini, CharacterSerialiser, ItemSerialiser
 
 import json
 
 
 class CharactersView(APIView):
     permission_classes=[IsAuthenticated] 
+    serializer_class = CharacterSerialiserMini(many=True)
+
     def get(self, request):
         characters = request.user.character_set.all()
-        payload = {"characters" : [character.basic_info() for character in characters]}
-        return JsonResponse(payload)
-
-
+        #payload = {"characters" : [character.basic_info() for character in characters]}
+        payload = CharacterSerialiserMini(characters, many=True)
+        return Response(payload.data)
 
 class CharacterView(APIView):
     permission_classes=[IsAuthenticated] 
+    serializer_class = CharacterSerialiser
     def get(self, request, character_id):
         try:
             character = Character.objects.get(id=character_id)
@@ -68,11 +74,74 @@ class CharacterView(APIView):
 
 class CardsView(APIView):
     permission_classes=[IsAuthenticated] 
+    
+
+    @extend_schema(parameters=[
+        OpenApiParameter("characterClass", OpenApiTypes.STR)
+    ],        
+        responses=AbilityCardSerialiser(many=True))
     def get(self, request):
-        character_class_id = request.GET.get("characterClass")
-        cards = AbilityCard.objects.filter(character_class=character_class_id)
-        payload = {"cards" : [card.payload() for card in cards]}
-        return JsonResponse(payload)
+        self.serializer_class = AbilityCardSerialiser
+        character_class = request.GET.get("characterClass")
+        cards = AbilityCard.objects.filter(character_class=character_class)
+        serialiser = AbilityCardSerialiser(cards, many=True)
+        payload = serialiser.data
+        return JsonResponse(payload, safe=False)
+    
+    @extend_schema(request=CharacterCardSerialiser(many=True))
+    def post(self, request):
+        self.serializer_class = CharacterCardSerialiser
+        data = JSONParser().parse(request)
+        serialiser = CharacterCardSerialiser(data=data, many=True)
+        for card in data:
+            CharacterCard.objects.filter(character=card["character"],ability_card=card["abilityCard"]).all().delete()
+        if serialiser.is_valid():
+            serialiser.save()
+            return JsonResponse(serialiser.data, status=201, safe=False)
+        return Response(serialiser.errors, status=400)
+
+class ItemsView(APIView):
+    permission_classes=[IsAuthenticated] 
+
+    @extend_schema(responses=ItemSerialiser(many=True))
+    def get(self, request):
+        items = Item.objects.all()
+        payload = [item.payload() for item in items]
+        return JsonResponse(payload, safe=False)
+    
+    
+class CharacterItemsView(APIView):
+    permission_classes=[IsAuthenticated] 
+
+    def patch(self, request):
+        data = JSONParser().parse(request)
+        items = CharacterItem.objects.filter(character=data["characterId"]).all()
+        for item in items:
+            if item.id in data["itemsToEquip"]:
+                item.equipped = True
+            else:
+                item.equipped = False
+            item.save(update_fields=["equipped"])
+        return HttpResponse(status=200)
+
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        item = CharacterItem(character=data["characterId"],item=data["itemId"],equipped=False)
+        item.save()
+        return JsonResponse(data=item.payload(),status=200)
+
+
+class CardUnlockView(APIView):
+    serializer_class = CharacterCardUnlockSerialiser
+    @extend_schema(request=CharacterCardUnlockSerialiser(many=False))
+    def post(self, request):
+        data = JSONParser().parse(request)
+        serialiser = CharacterCardUnlockSerialiser(data=data, many=False)
+        if serialiser.is_valid():
+            serialiser.save()
+            return JsonResponse(serialiser.data, status=201)
+        return JsonResponse(serialiser.errors, status=400)
 
 class PerksView(APIView):
     permission_classes=[IsAuthenticated] 
