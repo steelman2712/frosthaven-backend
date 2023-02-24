@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiTypes
 
-from .models import Character, AbilityCard, Perk, CharacterClass, CharacterCard, Item, CharacterItem
+from .models import Character, AbilityCard, Perk, CharacterClass, CharacterCard, Item, CharacterItem, CharacterPerk
 from .serialisers import CharacterSerialiser, CharacterCardSerialiser, AbilityCardSerialiser, CharacterCardUnlockSerialiser, CharacterSerialiserMini, CharacterSerialiser, ItemSerialiser
 
 import json
@@ -56,7 +56,7 @@ class CharacterView(APIView):
             character_class_name = body["characterClass"]
             name = body["name"]
             character_class = CharacterClass.objects.filter(name=character_class_name).all()[0]
-            character = Character(player=player, name=name, character_class=character_class)
+            character = Character(player=player, name=name, characterClass=character_class)
             character.save()
 
             cards = AbilityCard.objects.filter(character_class=character_class, level=1).all()
@@ -127,9 +127,17 @@ class CharacterItemsView(APIView):
 
     def post(self, request):
         data = JSONParser().parse(request)
-        item = CharacterItem(character=data["characterId"],item=data["itemId"],equipped=False)
-        item.save()
-        return JsonResponse(data=item.payload(),status=200)
+        character = Character.objects.filter(id=data["characterId"]).first()
+        item = Item.objects.filter(id=data["itemId"]).first()
+        character_item = CharacterItem(character=character,item=item,equipped=False)
+        character_item.save()
+        return JsonResponse(data=character_item.payload(),status=200)
+    
+    def delete(self, request):
+        data = JSONParser().parse(request)
+        character_item = CharacterItem.objects.filter(id=data["characterItemId"]).first()
+        character_item.delete()
+        return HttpResponse(status=200)
 
 
 class CardUnlockView(APIView):
@@ -150,3 +158,16 @@ class PerksView(APIView):
         perks = Perk.objects.filter(character_class=character_class_id)
         payload = {"perks" : [perk.payload() for perk in perks]}
         return JsonResponse(payload)
+    
+    def post(self, request):
+        data = JSONParser().parse(request)
+        character = Character.objects.filter(id=data["characterId"]).first()
+        if not character:
+            return HttpResponse("Invalid character id",status=400)
+        perk = Perk.objects.filter(id=data["perkId"]).first()
+        if not perk:
+            return HttpResponse("Invalid perk id",status=400)
+        character_perk = CharacterPerk(character = character, perk=perk)
+        character_perk.save()
+        return HttpResponse(status=200)
+

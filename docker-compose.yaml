@@ -9,10 +9,9 @@ services:
       - ./src:/src
     ports:
       - "8006:8000"
-      - "6380:6380"
     environment:
       - DJANGO_REDIS_HOST=redis
-      - DJANGO_REDIS_PORT=6380
+      - DJANGO_REDIS_PORT=6379
     env_file:
       - .env
     depends_on:

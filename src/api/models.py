@@ -52,6 +52,18 @@ class Item(models.Model):
     isReturnedOnLongRest = models.BooleanField(default=False)
     image = models.ImageField(upload_to='items/', blank=True, null=True)
 
+    gold = models.IntegerField(default=0)
+    wood = models.IntegerField(default=0)
+    iron = models.IntegerField(default=0)
+    leather = models.IntegerField(default=0)
+
+    arrowvine = models.IntegerField(default=0)
+    axenut = models.IntegerField(default=0)
+    corpsecap = models.IntegerField(default=0)
+    flamefruit = models.IntegerField(default=0)
+    rockroot = models.IntegerField(default=0)
+    snowthistle = models.IntegerField(default=0)
+
     flipName = models.CharField(max_length=200,blank=True, null=True)
     flipDescription = models.CharField(max_length=500, blank=True, null=True)
     flippedUses = models.IntegerField(blank=True, null=True)
@@ -60,6 +72,7 @@ class Item(models.Model):
     flippedFlipTimer = models.IntegerField(blank=True, null=True)
 
     upgradedFrom = models.IntegerField(blank=True,null=True)
+
 
     def __str__(self):
         return self.name
@@ -103,7 +116,7 @@ class Perk(models.Model):
 
 class Character(models.Model):
     player = models.ForeignKey(User,on_delete=models.CASCADE)
-    character_class = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
+    characterClass = models.ForeignKey(CharacterClass, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     experience = models.IntegerField(default=0)
     retired = models.BooleanField(default=False)
@@ -121,6 +134,8 @@ class Character(models.Model):
     rockroot = models.IntegerField(default=0)
     snowthistle = models.IntegerField(default=0)
 
+    perkTicks = models.IntegerField(default=0)
+
 
     def __str__(self):
         return self.name
@@ -128,7 +143,7 @@ class Character(models.Model):
     def basic_info(self):
         return {
             "id":self.id,
-            "characterClass":self.character_class.name,
+            "characterClass":self.characterClass.name,
             "name": self.name,
             "retired": self.retired
         }
@@ -142,12 +157,12 @@ class Character(models.Model):
         perks = [character_perk.perk for character_perk in character_perks]
         return {
             "id":self.id,
-            "characterClass":self.character_class.name,
+            "characterClass":self.characterClass.name,
             "name": self.name,
             "retired": self.retired,
             "experience":self.experience,
             "level" : get_level(self.experience),
-            "handSize":self.character_class.hand_size,
+            "handSize":self.characterClass.hand_size,
             "notes": self.notes,
 
             "gold": self.gold,
@@ -165,6 +180,7 @@ class Character(models.Model):
             "items":items,
             "abilityCards":ability_cards,
             "perks":[perk.payload() for perk in perks],
+            "perkTicks":self.perkTicks
         }
 
 class CharacterCard(models.Model):
@@ -208,3 +224,4 @@ class CharacterPerk(models.Model):
 
     def __str__(self):
         return f"{self.character} : {self.perk}"
+    

@@ -43,6 +43,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR ,"media")
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -68,8 +69,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-#CORS_ALLOWED_ORIGINS = [f"https://{DOMAIN}","http://localhost"]
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [f"https://{DOMAIN}","http://localhost:4200"]
+#CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'frosthaven.urls'
 
 SIMPLE_JWT = {
@@ -93,8 +94,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'frosthaven.wsgi.application'
+ASGI_APPLICATION = 'frosthaven.asgi.application'
 
-
+REDIS_HOST=os.environ.get("DJANGO_REDIS_HOST", "localhost")
+REDIS_PORT=os.environ.get("DJANGO_REDIS_PORT", 6379)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 

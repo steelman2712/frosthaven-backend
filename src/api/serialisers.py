@@ -42,7 +42,6 @@ class CharacterSerialiser(serializers.ModelSerializer):
 
 
 class CharacterSerialiserMini(serializers.ModelSerializer):
-    characterClass = serializers.CharField(source='character_class')
     class Meta:
         model = Character
         fields = ("id","characterClass","name","retired")

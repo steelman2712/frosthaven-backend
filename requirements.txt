@@ -1,5 +1,5 @@
 django
-channels
+channels[daphne]
 channels_redis
 django-bootstrap-v5
 django_cryptography

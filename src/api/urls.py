@@ -10,5 +10,5 @@ urlpatterns = [
     path('cards/unlock', CardUnlockView.as_view(), name='cards'),
     path('perks', PerksView.as_view(), name='perks'),
     path("items",ItemsView.as_view(),name="items"),
-    path("characteritems",CharacterItemsView.as_view(), name="character_items")
+    path("characteritems",CharacterItemsView.as_view(), name="character_items"),
 ]
