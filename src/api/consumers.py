@@ -3,6 +3,11 @@ from asgiref.sync import async_to_sync
 import json 
 
 class ChatConsumer(WebsocketConsumer):
+    room_name: str
+    room_group_name: str
+
+    _origins = ["scenario"]
+
     def connect(self):
         print("Connecting")
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -26,15 +31,23 @@ class ChatConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        context = text_data_json['context']
-        print(context)
-        message = text_data_json['message']
+        print(text_data_json)
+        origin = text_data_json["origin"]
+        if origin not in self._origins:
+            return
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': context,
-                'message': message
+                'type': origin,
+                'message': text_data_json
             }
+            
         )
+    
+    def scenario(self, event):
+        message = event['message']
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps(message))
